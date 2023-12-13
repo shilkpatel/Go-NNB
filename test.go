@@ -11,6 +11,6 @@ func main() {
 	a := 4
 	print(a)
 	zero := mat.NewDense(2, 2, nil)
-	print(zero)
+	print(zero.At(1, 1))
 
 }
