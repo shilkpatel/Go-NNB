@@ -1,4 +1,4 @@
-package main
+package ffnn
 
 import (
 	"gonum.org/v1/gonum/mat"
@@ -10,7 +10,7 @@ var ReLu = func(x float64) float64 {
 	if x < 0 {
 		return 0.0
 	} else {
-		return 1.0
+		return x
 	}
 }
 
@@ -37,7 +37,9 @@ func New(nodes []int, activation_functions []activation) network {
 	return network{weights, bias, activation_functions}
 }
 
-func Map()
+func test_New(weights []mat.Dense, bias []mat.Dense, activation_f []activation) network {
+	return network{weights, bias, activation_f}
+}
 
 func forward_pass(neural network, vector_input mat.Dense) mat.Dense {
 	for i, x := range neural.weights {
