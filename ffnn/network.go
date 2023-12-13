@@ -1,17 +1,23 @@
 package ffnn
 
 import (
+	"fmt"
+
 	"gonum.org/v1/gonum/mat"
 )
 
 type activation func(x float64) float64
 
-var ReLu = func(x float64) float64 {
+var ReLu activation = func(x float64) float64 {
 	if x < 0 {
 		return 0.0
 	} else {
 		return x
 	}
+}
+
+var Linear activation = func(x float64) float64 {
+	return x
 }
 
 type network struct {
@@ -26,7 +32,7 @@ func New(nodes []int, activation_functions []activation) network {
 	var bias []mat.Dense
 	var i int
 	for i = 0; i < len(nodes)-2; i++ {
-		weights = append(weights, *mat.NewDense(nodes[i], nodes[i+1], nil))
+		weights = append(weights, *mat.NewDense(nodes[i+1], nodes[i], nil))
 	}
 
 	var j int
@@ -43,13 +49,17 @@ func test_New(weights []mat.Dense, bias []mat.Dense, activation_f []activation) 
 
 func forward_pass(neural network, vector_input mat.Dense) mat.Dense {
 	for i, x := range neural.weights {
-		vector_input.Mul(&vector_input, &x)
-		vector_input.Add(&vector_input, &neural.bias[i])
-		var x, y int = vector_input.Dims()
+		var output mat.Dense
 
-		for j := 0; j < x; j++ {
-			vector_input.Set(j, y, neural.activation_function[i](vector_input.At(j, y)))
+		output.Mul(&vector_input, &x)
+		output.Add(&output, &neural.bias[i])
+
+		var x, y int = vector_input.Dims()
+		for j := 0; j < y; j++ {
+			fmt.Println(j)
+			output.Set(x-1, j, neural.activation_function[i](output.At(x-1, j)))
 		}
+		vector_input = output
 	}
 	return vector_input
 }
