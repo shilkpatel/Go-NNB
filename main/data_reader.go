@@ -1,0 +1,23 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"gonum.org/v1/gonum/mat"
+)
+
+type data struct {
+	raw_data []mat.Dense
+	input    []mat.Dense
+	labels   []mat.Dense
+}
+
+func load_data(filepath string) {
+	data, err := os.ReadFile(filepath)
+
+	if err != nil {
+		return
+	}
+	fmt.Println(string(data[0]))
+}
