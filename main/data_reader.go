@@ -19,5 +19,8 @@ func load_data(filepath string) {
 	if err != nil {
 		return
 	}
-	fmt.Println(string(data[0]))
+	fmt.Println(string(data[783]))
+	fmt.Println(string(data[784]))
+	fmt.Println(string(data[785]))
+
 }
