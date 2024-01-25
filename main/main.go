@@ -15,24 +15,33 @@ func main() {
 	}
 }
 
+// state of TUI
+const (
+	Start int = 0
+)
+
 type model struct {
-	choices  []string
-	cursor   int
-	selected map[int]struct{}
+	choices          []string
+	cursor           int
+	selected         map[int]struct{}
+	current_network  network
+	current_dataset  data
+	network_selected bool
+	dataset_selected bool
+	message_selected bool
 }
 
 func initialModel() model {
 	return model{
-		// Our to-do list is a grocery list
-		choices: []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
-
-		// A map which indicates which choices are selected. We're using
-		// the map like a mathematical set. The keys refer to the indexes
-		// of the `choices` slice, above.
-		selected: make(map[int]struct{}),
+		choices:          []string{"Load NN", "Create NN", "Load Dataset"},
+		selected:         make(map[int]struct{}),
+		network_selected: false,
+		dataset_selected: false,
+		message_selected: false,
 	}
 }
 
+// not run by developer
 func (m model) Init() tea.Cmd {
 	// Just return `nil`, which means "no I/O right now, please."
 	return nil
@@ -46,19 +55,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Cool, what was the actual key pressed?
 		switch msg.String() {
-
-		// These keys should exit the program.
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
 		// The "up" and "k" keys move the cursor up
-		case "up", "k":
+		case "up", "k", "w":
 			if m.cursor > 0 {
 				m.cursor--
 			}
 
 		// The "down" and "j" keys move the cursor down
-		case "down", "j":
+		case "down", "j", "s":
 			if m.cursor < len(m.choices)-1 {
 				m.cursor++
 			}
@@ -69,8 +76,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			_, ok := m.selected[m.cursor]
 			if ok {
 				delete(m.selected, m.cursor)
+				m.message_selected = false
 			} else {
-				m.selected[m.cursor] = struct{}{}
+				if !m.message_selected {
+					m.selected[m.cursor] = struct{}{}
+					m.message_selected = true
+				}
+
 			}
 		}
 	}
@@ -82,8 +94,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	// The header
-	s := "What should we buy at the market?\n\n"
-
+	s := "\nSelected Network:\n"
+	if m.network_selected {
+		s += m.current_network.name
+	}
+	s += "Selected Database:\n"
+	if m.dataset_selected {
+		s += m.current_dataset.name
+	}
 	// Iterate over our choices
 	for i, choice := range m.choices {
 

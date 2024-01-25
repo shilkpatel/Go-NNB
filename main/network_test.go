@@ -16,7 +16,7 @@ func TestRelu(t *testing.T) {
 func TestNetwork_1(t *testing.T) {
 	weight := mat.NewDense(2, 2, []float64{1, 1, 1, 1})
 	bias := mat.NewDense(1, 2, []float64{3, 4})
-	test_network := test_New([]mat.Dense{*weight}, []mat.Dense{*bias}, []activation{Linear})
+	test_network := test_New([]mat.Dense{*weight}, []mat.Dense{*bias}, []activation{Linear}, "hiii")
 	input := mat.NewDense(1, 2, []float64{0, 1})
 	result := forward_pass(test_network, *input)
 	assert.Equal(t, 4.0, result.At(0, 0))

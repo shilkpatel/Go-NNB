@@ -24,10 +24,11 @@ type network struct {
 	weights             []mat.Dense
 	bias                []mat.Dense
 	activation_function []activation
+	name                string
 }
 
 // needs to initalise weights and biases as random
-func New(nodes []int, activation_functions []activation) network {
+func New(nodes []int, activation_functions []activation, name string) network {
 	var weights []mat.Dense
 	var bias []mat.Dense
 	var i int
@@ -40,11 +41,11 @@ func New(nodes []int, activation_functions []activation) network {
 		bias = append(bias, *mat.NewDense(nodes[j], 1, nil))
 	}
 
-	return network{weights, bias, activation_functions}
+	return network{weights, bias, activation_functions, name}
 }
 
-func test_New(weights []mat.Dense, bias []mat.Dense, activation_f []activation) network {
-	return network{weights, bias, activation_f}
+func test_New(weights []mat.Dense, bias []mat.Dense, activation_f []activation, name string) network {
+	return network{weights, bias, activation_f, name}
 }
 
 func forward_pass(neural network, vector_input mat.Dense) mat.Dense {

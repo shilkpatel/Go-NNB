@@ -11,6 +11,7 @@ type data struct {
 	raw_data []mat.Dense
 	input    []mat.Dense
 	labels   []mat.Dense
+	name     string
 }
 
 func load_data(filepath string) {
