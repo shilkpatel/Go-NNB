@@ -15,26 +15,46 @@ func main() {
 	}
 }
 
+type state int
+
 // state of TUI
 const (
-	Start int = 0
+	Start state = iota
+	NN_settings
+	Create_NN
+	Run_NN
+	Load_NN
+	Save_NN
+
+	Database_settings
+	Load_database
 )
 
 type model struct {
-	choices          []string
-	cursor           int
-	selected         map[int]struct{}
-	current_network  network
-	current_dataset  data
+	menu            state
+	choices         map[int][]string
+	cursor          int
+	selected        int
+	current_network network
+	current_dataset data
+
 	network_selected bool
 	dataset_selected bool
 	message_selected bool
+
+	create_NN_layers              []int
+	create_NN_activation_function []activation
+	create_NN_model               network
 }
 
 func initialModel() model {
 	return model{
-		choices:          []string{"Load NN", "Create NN", "Load Dataset"},
-		selected:         make(map[int]struct{}),
+		menu: 0,
+		choices: map[int][]string{0: {"Neural Network Settings", "Database Settings"},
+			1: {"Create Neural Network", "Run Neural Network", "Load Neural Network", "Save Neural Network"},
+			2: {"Add Layer"}},
+		cursor:           0,
+		selected:         -1,
 		network_selected: false,
 		dataset_selected: false,
 		message_selected: false,
@@ -43,7 +63,6 @@ func initialModel() model {
 
 // not run by developer
 func (m model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
 	return nil
 }
 
@@ -66,23 +85,38 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// The "down" and "j" keys move the cursor down
 		case "down", "j", "s":
-			if m.cursor < len(m.choices)-1 {
+			if m.cursor < len(m.choices[int(m.menu)])-1 {
 				m.cursor++
 			}
 
-		// The "enter" key and the spacebar (a literal space) toggle
-		// the selected state for the item that the cursor is pointing at.
 		case "enter", " ":
-			_, ok := m.selected[m.cursor]
-			if ok {
-				delete(m.selected, m.cursor)
-				m.message_selected = false
-			} else {
-				if !m.message_selected {
-					m.selected[m.cursor] = struct{}{}
-					m.message_selected = true
-				}
 
+			if m.selected == -1 {
+				m.selected = m.cursor
+				m.message_selected = true
+				switch m.menu {
+				case Start:
+					if m.selected == 0 {
+						m.menu = NN_settings
+						m.cursor = 0
+						m.selected = -1
+
+					} else if m.selected == 1 {
+						m.menu = Database_settings
+						m.cursor = 0
+						m.selected = -1
+					}
+
+				case NN_settings:
+					if m.selected == 0 {
+						m.menu = Create_NN
+						m.cursor = 0
+						m.selected = -1
+					}
+
+				}
+			} else if m.selected == m.cursor {
+				m.selected = -1
 			}
 		}
 	}
@@ -103,25 +137,23 @@ func (m model) View() string {
 		s += m.current_dataset.name
 	}
 	// Iterate over our choices
-	for i, choice := range m.choices {
+	for i, choice := range m.choices[int(m.menu)] {
 
 		// Is the cursor pointing at this choice?
 		cursor := " " // no cursor
 		if m.cursor == i {
-			cursor = ">" // cursor!
+			cursor = ">"
 		}
+		/*
+			checked := " "
+			if m.selected == i {
+				checked = "x"
+			}
+		*/
 
-		// Is this choice selected?
-		checked := " " // not selected
-		if _, ok := m.selected[i]; ok {
-			checked = "x" // selected!
-		}
-
-		// Render the row
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		//s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		s += fmt.Sprintf("%s %s\n", cursor, choice)
 	}
-
-	// The footer
 	s += "\nPress q to quit.\n"
 
 	// Send the UI for rendering

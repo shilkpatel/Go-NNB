@@ -64,3 +64,21 @@ func forward_pass(neural network, vector_input mat.Dense) mat.Dense {
 	}
 	return vector_input
 }
+
+// finished but untested
+func add_layer(neural network, number_of_notes int, activation_function activation) {
+	if len(neural.weights) == 0 {
+		neural.weights = append(neural.weights, *mat.NewDense(number_of_notes, number_of_notes, nil))
+		neural.bias = append(neural.bias, *mat.NewDense(number_of_notes, 1, nil))
+	} else {
+		var length int = len(neural.bias)
+		row, col := neural.weights[length-1].Dims()
+		if row == 0 {
+			//prevents error from dims function
+			row = 1
+		}
+		//input of this layer equals output of last layer
+		neural.weights = append(neural.weights, *mat.NewDense(col, number_of_notes, nil))
+		neural.bias = append(neural.bias, *mat.NewDense(number_of_notes, 1, nil))
+	}
+}
