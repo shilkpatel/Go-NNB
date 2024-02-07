@@ -10,7 +10,7 @@ import (
 func main() {
 	p := tea.NewProgram(initialModel())
 	if _, err := p.Run(); err != nil {
-		fmt.Printf("Alas, there's been an error: %v", err)
+		fmt.Printf("Aaaaaaaaaaaaa: %v", err)
 		os.Exit(1)
 	}
 }
@@ -22,9 +22,6 @@ const (
 	Start state = iota
 	NN_settings
 	Create_NN
-	Run_NN
-	Load_NN
-	Save_NN
 
 	Database_settings
 	Load_database
@@ -40,24 +37,17 @@ type model struct {
 
 	network_selected bool
 	dataset_selected bool
-	message_selected bool
-
-	create_NN_layers              []int
-	create_NN_activation_function []activation
-	create_NN_model               network
 }
 
 func initialModel() model {
 	return model{
 		menu: 0,
 		choices: map[int][]string{0: {"Neural Network Settings", "Database Settings"},
-			1: {"Create Neural Network", "Run Neural Network", "Load Neural Network", "Save Neural Network"},
-			2: {"Add Layer"}},
+			1: {"Create Neural Network", "Run Neural Network", "Load Neural Network", "Save Neural Network"}},
 		cursor:           0,
 		selected:         -1,
 		network_selected: false,
 		dataset_selected: false,
-		message_selected: false,
 	}
 }
 
@@ -67,6 +57,7 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
 	switch msg := msg.(type) {
 
 	// Is it a key press?
@@ -93,7 +84,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if m.selected == -1 {
 				m.selected = m.cursor
-				m.message_selected = true
 				switch m.menu {
 				case Start:
 					if m.selected == 0 {
@@ -112,6 +102,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.menu = Create_NN
 						m.cursor = 0
 						m.selected = -1
+
 					}
 
 				}
@@ -136,6 +127,13 @@ func (m model) View() string {
 	if m.dataset_selected {
 		s += m.current_dataset.name
 	}
+
+	switch m.menu {
+	case Create_NN:
+		a := c_NN_initiate()
+		return s + a.View()
+	}
+
 	// Iterate over our choices
 	for i, choice := range m.choices[int(m.menu)] {
 
