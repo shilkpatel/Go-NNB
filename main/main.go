@@ -102,6 +102,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				case NN_settings:
 					if m.selected == 0 {
 						m.menu = Create_NN
+						m.NN_setting = c_NN_initiate()
 						m.cursor = 0
 						m.selected = -1
 
@@ -132,8 +133,7 @@ func (m model) View() string {
 
 	switch m.menu {
 	case Create_NN:
-		a := c_NN_initiate()
-		return s + a.View()
+		return s + m.NN_setting.View()
 	}
 
 	// Iterate over our choices

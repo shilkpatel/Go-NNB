@@ -15,9 +15,10 @@ const (
 )
 
 type c_NN_model struct {
-	menu    state
-	choices map[int][]string
-	cursor  int
+	menu        state
+	choices     map[int][]string
+	cursor      int
+	new_network network
 }
 
 func c_NN_initiate() c_NN_model {
