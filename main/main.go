@@ -37,6 +37,8 @@ type model struct {
 
 	network_selected bool
 	dataset_selected bool
+
+	NN_setting c_NN_model
 }
 
 func initialModel() model {
