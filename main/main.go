@@ -59,7 +59,13 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-
+	var cmd tea.Cmd
+	switch m.menu {
+	case Create_NN:
+		newmodel, newcmd := m.NN_setting.Update(msg)
+		m.NN_setting = newmodel.(c_NN_model)
+		cmd = newcmd
+	}
 	switch msg := msg.(type) {
 
 	// Is it a key press?
@@ -117,7 +123,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// Return the updated model to the Bubble Tea runtime for processing.
 	// Note that we're not returning a command.
-	return m, nil
+	return m, cmd
 }
 
 func (m model) View() string {
@@ -133,7 +139,12 @@ func (m model) View() string {
 
 	switch m.menu {
 	case Create_NN:
-		return s + m.NN_setting.View()
+		status := s + m.NN_setting.View()
+		if status == "done" { //take all information from the model here
+			m.menu = Start
+		} else {
+			return status
+		}
 	}
 
 	// Iterate over our choices
@@ -144,14 +155,6 @@ func (m model) View() string {
 		if m.cursor == i {
 			cursor = ">"
 		}
-		/*
-			checked := " "
-			if m.selected == i {
-				checked = "x"
-			}
-		*/
-
-		//s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
 		s += fmt.Sprintf("%s %s\n", cursor, choice)
 	}
 	s += "\nPress q to quit.\n"
